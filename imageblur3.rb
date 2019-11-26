@@ -3,7 +3,7 @@ class Image
   
      #attr_accessor is a substitue for both reader and writer
      #allows the outside world to see and update the picture(data)
-    attr_accessor :picture
+    attr_accessor :picture, :distance
      
      #initialize is the constructor its building up the image
     def initialize(picture)
@@ -28,18 +28,25 @@ class Image
    
   
    # This blur! method instructs how to change the pixels around the 1.  
-        def blur!
-          ones = get_ones
-          ones.each do |found_row_number, found_col_number|        
-            @picture[found_row_number -1][found_col_number] = 1 unless found_row_number == 0 #up
-            @picture[found_row_number +1][found_col_number] = 1 unless found_row_number == @picture.length-1   #down
-            @picture[found_row_number][found_col_number -1] = 1 unless found_col_number == 0 #left
-            @picture[found_row_number][found_col_number +1] = 1 unless found_col_number == @picture[found_row_number].length-1  #right
+        def blur(distance)
+    ones = get_ones
+
+    @picture.each_with_index do |row, row_index|
+      row.each_with_index do |item, column_index|
+        ones.each do |found_row_index, found_column_index|
+          if manhattan_distance(column_index, row_index, found_column_index, found_row_index) <= distance
+            @picture[row_index][column_index] = 1
           end
         end
+      end
+    end
+  end
 
-  
-
+  def manhattan_distance (x1, y1, x2, y2)
+    horizontal_distance = (x2 - x1).abs
+    vertical_distance = (y2 - y1).abs
+    horizontal_distance + vertical_distance
+  end
 
   def output_image
     @picture.each do |data|
@@ -52,15 +59,22 @@ end
 image = Image.new([
   [0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0],
-  [0, 0, 1, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 1, 0, 0],
+  [0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0]
+
+
 ])
 
 
+image.output_image
+puts
 
-puts 
-image.blur!
 
+image.blur(4)
 image.output_image
